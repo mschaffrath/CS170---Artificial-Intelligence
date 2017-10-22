@@ -1,16 +1,21 @@
+#
 #  CS170 - Artifical Intelligence
 #
 #  Author: Mathew Schaffrath
 #
 
 import copy
+import operator
 
 class Node(object):
   def __init__(self,state):
     self.state = state
-  def SetCost(mth):
-    self.mth = mth
-
+  gn = 0
+  hn = 0
+  def SetGn(self, cost):
+    self.gn = cost
+  def SetHn(self, cost):
+    self.hn = cost
 
 goalState = [['1','2','3'],
              ['4','5','6'],
@@ -79,43 +84,50 @@ def Expand(node, ops):
       continue
     x = i
   coord = (x,y)
-  
+
   if (x == 1 or x == 0):
     newNodes.append(ops.MoveBlankDown(downNode, coord))
   if (x == 1 or x == 2):
     newNodes.append(ops.MoveBlankUp(upNode, coord))
   if (y == 1 or y == 0):
     newNodes.append(ops.MoveBlankRight(rightNode, coord))
-  if (y == 1 or y == 0):
+  if (y == 1 or y == 2):
     newNodes.append(ops.MoveBlankLeft(leftNode, coord))
 
   return newNodes
 
-def CompareElements(node):
+def CountAndSetMTH(node):
+  mthCount = 0
   for i in range(len(node.state)):
     for j in range(len(node.state[i])):
-      if goalState[i][j] != "b" and (node.state[i][j] == goalState[i][j]):
-        return True
+      if goalState[i][j] != "b" and (node.state[i][j] != goalState[i][j]):
+        mthCount += 1
+  node.SetGn(mthCount)
+  return True
 
 def CalcMTH(nodes):
-  mthCount = 0
   for i in range(len(nodes)):
-    print("comparing: ")
-    PrintFormattedState(nodes[i].state)
-    if CompareElements(nodes[i]):
-      mthCount += 1
-  print("mth: ", mthCount)
-  return mthCount
+    CountAndSetMTH(nodes[i])
+  return True
 
 def UCS(nodes, listOfNewNodes):
   for i in range(len(listOfNewNodes)):
     nodes.append(listOfNewNodes[i])
   return nodes
 
+
 def MTH(nodes, listOfNewNodes):
+  CalcMTH(listOfNewNodes)
+  #print("UNSORTED:")
+  #for i in range(len(listOfNewNodes)):
+  #  PrintFormattedState(listOfNewNodes[i].state)
+  #print("SORTED:")
+  #for i in range(len(listOfNewNodes)):
+  #  PrintFormattedState(listOfNewNodes[i].state)
+
   for i in range(len(listOfNewNodes)):
     nodes.append(listOfNewNodes[i])
-    CalcMTH(nodes)
+  nodes = sorted(nodes, key=operator.attrgetter('gn'))
   return nodes
 
 prevQMax = 0
@@ -147,12 +159,17 @@ def GeneralSearch(initState, QueueingFunction):
     print("Expanding State: ")
     PrintFormattedState(node.state)
     nodes = QueueingFunction(nodes, Expand(node, Operators()))
+    print("Expanded to: ")
+    for i in range(len(nodes)): 
+      PrintFormattedState(nodes[i].state)
+      print("tiles out of place: ", nodes[i].gn)
+      print("\n")
 
 defaultInitState = [['1','2','3'],
                     ['4','5','6'],
                     ['7','b','8']]
 
-print ("PROGRAM START")
+print ("\nPROGRAM START")
 
 print ("Welcome to Mathew Schaffrath 8-puzzle solver.")
 print ("Type \"1\" to use a default puzzle, or \"2\" to enter your own puzzle.")
@@ -178,7 +195,7 @@ print("\t", "2.  A* with the Misplaced Tile heuristic")
 print("\t", "3.  A* with the Manhattan distance heuristic")
 selectAlg = input("         ")
 
-print("Initial State: ")
+print("\nInitial State: ")
 PrintFormattedState(problem.state)
 if selectAlg == "1":
   GeneralSearch(problem, UCS)
@@ -188,7 +205,7 @@ if selectAlg == "2":
 print("Nodes expanded: ", expandCount)
 print("Max # of nodes in queue at any one time: ", queueSize)
 
-print ("PROGRAM END")
+print ("PROGRAM END\n")
 
 
 
