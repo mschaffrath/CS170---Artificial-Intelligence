@@ -31,17 +31,74 @@ def GoalTest(node):
   return node.state == goalState
 
 class Operators():
-  def MoveBlankLeft():
-    apple = 1
-  def MoveBlankRight():
-    apple = 1
-  def MoveBlankUp():
-    apple = 1
-  def MoveBlankDown():
-    apple = 1
+  def MoveBlankLeft(self, node, coord):
+    print("move left called")
+    x = coord[0]
+    y = coord[1]
+    tempVal = node.state[x][y-1]
+    print("tempVal: ", tempVal)
+    node.state[x][y] = tempVal
+    node.state[x][y-1] = "b" 
+    return node
+  def MoveBlankRight(self, node, coord):
+    print("move right called")
+    x = coord[0]
+    y = coord[1]
+    tempVal = node.state[x][y+1]
+    print("tempVal: ", tempVal)
+    node.state[x][y] = tempVal
+    node.state[x][y+1] = "b" 
+    return node
+  def MoveBlankUp(self, node, coord):
+    print("move up called")
+    x = coord[0]
+    y = coord[1]
+    tempVal = node.state[x-1][y]
+    print("tempVal: ", tempVal)
+    node.state[x][y] = tempVal
+    node.state[x-1][y] = "b" 
+    return node
+  def MoveBlankDown(self, node, coord):
+    print("move down called")
+    x = coord[0]
+    y = coord[1]
+    tempVal = node.state[x+1][y]
+    print("tempVal: ", tempVal)
+    node.state[x][y] = tempVal
+    node.state[x+1][y] = "b" 
+    return node
+ 
+def Expand(node, ops):
+  newNodes = []
 
-def Expand(node, Operators):
+  for i in range(len(node.state)):
+    try:
+      y = node.state[i].index("b")
+    except:
+      continue
+    x = i
+  coord = (x,y)
+  print("coord: ", x , " " , y) 
   
+  if (x == 1 or x == 0):
+#    newNodes.append(ops.MoveBlankDown(node))
+    sdf = 1
+  if (x == 1 or x == 2):
+    newNodes.append(ops.MoveBlankUp(node, coord))
+  if (y == 1 or y == 0):
+#    newNodes.append(ops.MoveBlankRight(node))
+    fdsa = 2
+  if (y == 1 or y == 0):
+#    newNodes.append(ops.MoveBlankLeft(node))
+    af = 3
+
+  print ("new nodes: ")
+  for i in range(len(newNodes)):
+    print (newNodes[i].state)
+  return newNodes
+
+# def QueueingFunction(nodes, listOfNewNodes):
+
 
 # TESTING *************************
 MakeNode(initState)
@@ -64,9 +121,11 @@ def GeneralSearch(initState):
       print ("success")
       return True
     
-    Expand(node, Operators)
+    ops = Operators()
+    Expand(node, ops)
 
     return False
+
 #    nodes = QueueingFunction(nodes, Expand(node, Operators))
 
 
