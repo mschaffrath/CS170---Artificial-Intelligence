@@ -3,12 +3,11 @@
 #  Author: Mathew Schaffrath
 #
 
-class Node():
+import copy
+
+class Node(object):
   def __init__(self,state):
     self.state = state
-    print("in Node class")
-    print(state)
-    print("end Node class")
 
 initState = [[1,  2,  3 ],
              [4,  5,  6 ],
@@ -16,7 +15,6 @@ initState = [[1,  2,  3 ],
 goalState = [[1,  2,  3 ],
              [4,  5,  6 ],
              [7,  8, "b"]]
-
 
 def MakeNode(initState):
   print("Make Node called")
@@ -41,7 +39,7 @@ class Operators():
     node.state[x][y-1] = "b" 
     return node
   def MoveBlankRight(self, node, coord):
-    print("move right called")
+    print("move right called on: ", node.state)
     x = coord[0]
     y = coord[1]
     tempVal = node.state[x][y+1]
@@ -50,7 +48,7 @@ class Operators():
     node.state[x][y+1] = "b" 
     return node
   def MoveBlankUp(self, node, coord):
-    print("move up called")
+    print("move up called on: ", node.state)
     x = coord[0]
     y = coord[1]
     tempVal = node.state[x-1][y]
@@ -70,6 +68,10 @@ class Operators():
  
 def Expand(node, ops):
   newNodes = []
+  upNode = copy.deepcopy(node)
+  downNode = copy.deepcopy(node)
+  leftNode = copy.deepcopy(node)
+  rightNode = copy.deepcopy(node)
 
   for i in range(len(node.state)):
     try:
@@ -81,20 +83,22 @@ def Expand(node, ops):
   print("coord: ", x , " " , y) 
   
   if (x == 1 or x == 0):
-#    newNodes.append(ops.MoveBlankDown(node))
-    sdf = 1
+    newNodes.append(ops.MoveBlankDown(downNode, coord))
   if (x == 1 or x == 2):
-    newNodes.append(ops.MoveBlankUp(node, coord))
+    newNodes.append(ops.MoveBlankUp(upNode, coord))
   if (y == 1 or y == 0):
-#    newNodes.append(ops.MoveBlankRight(node))
-    fdsa = 2
+    newNodes.append(ops.MoveBlankRight(rightNode, coord))
   if (y == 1 or y == 0):
-#    newNodes.append(ops.MoveBlankLeft(node))
-    af = 3
+    newNodes.append(ops.MoveBlankLeft(leftNode, coord))
 
   print ("new nodes: ")
-  for i in range(len(newNodes)):
-    print (newNodes[i].state)
+  print (newNodes[0].state[0])
+  print (newNodes[0].state[1])
+  print (newNodes[0].state[2])
+  print (newNodes[1].state[0])
+  print (newNodes[1].state[1])
+  print (newNodes[1].state[2])
+   
   return newNodes
 
 # def QueueingFunction(nodes, listOfNewNodes):
