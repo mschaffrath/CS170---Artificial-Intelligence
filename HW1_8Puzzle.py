@@ -8,6 +8,9 @@ import copy
 class Node(object):
   def __init__(self,state):
     self.state = state
+  def SetCost(mth):
+    self.mth = mth
+
 
 goalState = [['1','2','3'],
              ['4','5','6'],
@@ -88,10 +91,31 @@ def Expand(node, ops):
 
   return newNodes
 
+def CompareElements(node):
+  for i in range(len(node.state)):
+    for j in range(len(node.state[i])):
+      if goalState[i][j] != "b" and (node.state[i][j] == goalState[i][j]):
+        return True
 
-def QueueingFunction(nodes, listOfNewNodes):
+def CalcMTH(nodes):
+  mthCount = 0
+  for i in range(len(nodes)):
+    print("comparing: ")
+    PrintFormattedState(nodes[i].state)
+    if CompareElements(nodes[i]):
+      mthCount += 1
+  print("mth: ", mthCount)
+  return mthCount
+
+def UCS(nodes, listOfNewNodes):
   for i in range(len(listOfNewNodes)):
     nodes.append(listOfNewNodes[i])
+  return nodes
+
+def MTH(nodes, listOfNewNodes):
+  for i in range(len(listOfNewNodes)):
+    nodes.append(listOfNewNodes[i])
+    CalcMTH(nodes)
   return nodes
 
 prevQMax = 0
@@ -120,7 +144,7 @@ def GeneralSearch(initState, QueueingFunction):
       return True
 
     expandCount += 1
-    print("Expanding Node: ")
+    print("Expanding State: ")
     PrintFormattedState(node.state)
     nodes = QueueingFunction(nodes, Expand(node, Operators()))
 
@@ -136,7 +160,7 @@ selectPuzzle = input("")
 
 if selectPuzzle == "2":
   userInitState = []
-  print ("Enter your puzzle, use a zero to represent the blank")
+  print ("Enter your puzzle, use a \"b\" to represent the blank")
   row1 = input("Enter the first row, use space or tabes between numbers   ")
   userInitState.append(row1.split())
   row2 = input("Enter the first row, use space or tabes between numbers   ")
@@ -157,9 +181,9 @@ selectAlg = input("         ")
 print("Initial State: ")
 PrintFormattedState(problem.state)
 if selectAlg == "1":
-  GeneralSearch(problem, QueueingFunction)
+  GeneralSearch(problem, UCS)
 if selectAlg == "2":
-  print("2")
+  GeneralSearch(problem, MTH)
 
 print("Nodes expanded: ", expandCount)
 print("Max # of nodes in queue at any one time: ", queueSize)
