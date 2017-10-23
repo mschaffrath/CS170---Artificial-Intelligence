@@ -94,7 +94,19 @@ def Expand(node, ops):
   if (y == 1 or y == 2):
     newNodes.append(ops.MoveBlankLeft(leftNode, coord))
 
+#  newNodes = PruneStates(newNodes)
   return newNodes
+
+def PruneStates(nodes):
+  end = len(nodes)
+  for i in range(end):
+    for j in range(i+1, end):
+      if nodes[i].state == nodes[j].state:
+        print("STATE PRUNED:--------------------------------------")
+        PrintFormattedState(nodes[j].state)
+        del nodes[j]
+        end -= 1
+  return nodes
 
 def CountAndSetMTH(node):
   mthCount = 0
@@ -105,16 +117,50 @@ def CountAndSetMTH(node):
   node.SetGn(mthCount)
   return True
 
+def ReturnDifference(value, coord):
+  if value == '1':
+    diff = abs(coord[0] - 0) + abs(coord[1] - 0)
+  elif value == '2':
+    diff = abs(coord[0] - 0) + abs(coord[1] - 1)
+  elif value == '3':
+    diff = abs(coord[0] - 0) + abs(coord[1] - 2)
+  elif value == '4':
+    diff = abs(coord[0] - 1) + abs(coord[1] - 0)
+  elif value == '5':
+    diff = abs(coord[0] - 1) + abs(coord[1] - 1)
+  elif value == '6':
+    diff = abs(coord[0] - 1) + abs(coord[1] - 2)
+  elif value == '7':
+    diff = abs(coord[0] - 2) + abs(coord[1] - 0)
+  elif value == '8':
+    diff = abs(coord[0] - 2) + abs(coord[1] - 1)
+  elif value == 'b':
+    diff = abs(coord[0] - 2) + abs(coord[1] - 2)
+  return diff
+
+def CountAndSetMDH(node):
+  mdhCount = 0
+  for i in range(len(node.state)):
+    for j in range(len(node.state[i])):
+      if node.state[i][j] != "b" and (node.state[i][j] != goalState[i][j]):
+        mdhCount += ReturnDifference(node.state[i][j], (i,j))
+  node.SetHn(mdhCount)
+  return True
+
 def CalcMTH(nodes):
   for i in range(len(nodes)):
     CountAndSetMTH(nodes[i])
+  return True
+
+def CalcMDH(nodes):
+  for i in range(len(nodes)):
+    CountAndSetMDH(nodes[i])
   return True
 
 def UCS(nodes, listOfNewNodes):
   for i in range(len(listOfNewNodes)):
     nodes.append(listOfNewNodes[i])
   return nodes
-
 
 def MTH(nodes, listOfNewNodes):
   CalcMTH(listOfNewNodes)
@@ -128,6 +174,13 @@ def MTH(nodes, listOfNewNodes):
   for i in range(len(listOfNewNodes)):
     nodes.append(listOfNewNodes[i])
   nodes = sorted(nodes, key=operator.attrgetter('gn'))
+  return nodes
+
+def MDH(nodes, listOfNewNodes):
+  CalcMDH(listOfNewNodes)
+  for i in range(len(listOfNewNodes)):
+    nodes.append(listOfNewNodes[i])
+  nodes = sorted(nodes, key = operator.attrgetter('hn'))
   return nodes
 
 prevQMax = 0
@@ -156,20 +209,21 @@ def GeneralSearch(initState, QueueingFunction):
       return True
 
     expandCount += 1
-    print("Expanding State: ")
-    PrintFormattedState(node.state)
+#    print("Expanding State: ")
+#    PrintFormattedState(node.state)
     nodes = QueueingFunction(nodes, Expand(node, Operators()))
-    print("Expanded to: ")
-    for i in range(len(nodes)): 
-      PrintFormattedState(nodes[i].state)
-      print("tiles out of place: ", nodes[i].gn)
-      print("\n")
+#    print("Expanded to: ")
+#    for i in range(len(nodes)): 
+#      PrintFormattedState(nodes[i].state)
+#      print("gn: ", nodes[i].gn, " ", "hn: ", nodes[i].hn)
+#      print("sumCost: ", nodes[i].gn + nodes[i].hn)
+#      print("\n")
 
-defaultInitState = [['1','2','3'],
-                    ['4','5','6'],
-                    ['7','b','8']]
+defaultInitState = [['8','7','1'],
+                    ['6','b','2'],
+                    ['5','4','3']]
 
-print ("\nPROGRAM START")
+print ("\n\n\n****PROGRAM START****")
 
 print ("Welcome to Mathew Schaffrath 8-puzzle solver.")
 print ("Type \"1\" to use a default puzzle, or \"2\" to enter your own puzzle.")
@@ -201,11 +255,13 @@ if selectAlg == "1":
   GeneralSearch(problem, UCS)
 if selectAlg == "2":
   GeneralSearch(problem, MTH)
+if selectAlg == "3":
+  GeneralSearch(problem, MDH)
 
 print("Nodes expanded: ", expandCount)
 print("Max # of nodes in queue at any one time: ", queueSize)
 
-print ("PROGRAM END\n")
+print ("*****PROGRAM END*****\n\n\n")
 
 
 
