@@ -29,8 +29,12 @@ class Node(object):
     return self.depth
   def SetDepth(self, cost):
     self.depth = cost
+  def GetGn(self):
+    return self.gn
   def SetGn(self, cost):
     self.gn = cost
+  def GetHn(self):
+    return self.hn
   def SetHn(self, cost):
     self.hn = cost
   def SetTotalMDH(self):
@@ -48,9 +52,9 @@ prevQMax = 0
 repeat = 0
 
 # Hardcoded initial and goal states
-defaultInitState = [['8','7','1'],
-                    ['6','b','2'],
-                    ['5','4','3']]
+defaultInitState = [['4','2','6'],
+                    ['7','1','8'],
+                    ['3','b','5']]
 goalState = [['1','2','3'],
              ['4','5','6'],
              ['7','8','b']]
@@ -310,12 +314,13 @@ def GeneralSearch(initState, QueueingFunction):
     if GoalTest(node):
       print ("Success")
       print ("Goal Node Depth: ", node.depth)
-      print ("Path: ")
-      GetPath(node)
+#      print ("Path: ")
+#      GetPath(node)
       return True
 
     print("Expanding Node: ")
     PrintFormattedState(node.state)
+    print("depth = ", node.GetDepth(), ", ", "Missing Tile = ", node.GetGn(), ", ", "Manhattan = ", node.GetHn())
     # Populte the queue with the newly expanded nodes in the proper order
     nodes = QueueingFunction(nodes, Expand(node, Operators()))
 
@@ -360,7 +365,7 @@ if selectAlg == "3":
 
 # Output data
 print("Nodes expanded: ", expandCount)
-print("Max # of nodes in queue at any one time: ", queueSize)
+print("Max queue size: ", queueSize)
 
 print ("*****  PROGRAM END  *****\n\n\n")
 
