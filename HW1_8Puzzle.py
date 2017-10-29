@@ -310,10 +310,12 @@ def GeneralSearch(initState, QueueingFunction):
     if GoalTest(node):
       print ("Success")
       print ("Goal Node Depth: ", node.depth)
-#      print ("Path: ")
-#      GetPath(node)
+      print ("Path: ")
+      GetPath(node)
       return True
-    
+
+    print("Expanding Node: ")
+    PrintFormattedState(node.state)
     # Populte the queue with the newly expanded nodes in the proper order
     nodes = QueueingFunction(nodes, Expand(node, Operators()))
 
